@@ -29,8 +29,8 @@ A request can only ever read flags belonging to the key's own environment.
 
 | Header               | Format | Example |
 |----------------------|--------|---------|
-| `X-Potato-Key-Id`    | `key_` + 26-char ULID | `key_01JZZTESTKEY00000000000000` |
-| `X-Potato-Timestamp` | Unix time in **seconds**, base-10 integer | `1767225600` |
+| `X-Potato-Key-Id`    | `key_` + 26-char ULID, uppercase Crockford Base32: `^key_[0-9A-HJKMNP-TV-Z]{26}$` | `key_01JZZTESTKEY00000000000000` |
+| `X-Potato-Timestamp` | Unix time in **seconds**, base-10 integer with no sign and no leading zeros: `^(0\|[1-9][0-9]*)$` | `1767225600` |
 | `X-Potato-Nonce`     | 16–64 chars of `[A-Za-z0-9_-]`; generate from ≥ 16 random bytes, base64url-encoded | `bm9uY2UtMDAwMDAwMDAx` |
 | `X-Potato-Signature` | Base64url (RFC 4648 §5), **no padding**, of the 64-byte signature | `DYzV8-YB4P4w…` (86 chars) |
 
@@ -60,7 +60,14 @@ Rules:
   and the API must not rewrite the path**, or signatures will fail.
 - **Body hash:** hash the exact bytes sent. Don't re-serialize the JSON. An
   empty body hashes to `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+- **Method:** signers MUST send standard uppercase methods (`GET`, `POST`,
+  `PATCH`, …), and the canonical string uses the method uppercased. Note that
+  `fetch` does not uppercase `patch`, so always pass uppercase. Verifiers
+  uppercase the received method before building the canonical string.
 - Header values are used verbatim (no trimming beyond what HTTP itself does).
+- Signers and verifiers apply the same format regexes (above). A verifier
+  rejects any header that fails them with `missing_or_malformed_headers`
+  before doing anything else.
 
 ## Verification (API)
 
