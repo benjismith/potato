@@ -2,7 +2,7 @@
 id: "000010"
 title: Set up the SDK sub-project
 type: task
-status: open
+status: done
 priority: P0
 created: 2026-10-05
 updated: 2026-10-05
@@ -23,7 +23,7 @@ Scaffold `potato-sdk/`: a TypeScript library for **server-side Node.js** (≥ 22
 
 ## Acceptance criteria
 
-- [ ] `potato-sdk/` has `package.json` (no `dependencies`), `tsconfig.json` (strict), `tsconfig.build.json`, `src/index.ts`, and `README.md`.
-- [ ] `npm run build` emits ESM JS and `.d.ts` into `dist/`. `npm run typecheck` covers `src/` and `test/`.
-- [ ] `npm test` runs Vitest with at least one passing smoke test that imports from `src/index.ts`.
-- [ ] The root `README.md` lists `potato-sdk/`.
+- [x] `potato-sdk/` has `package.json` (no `dependencies`), `tsconfig.json` (strict), `tsconfig.build.json`, `src/index.ts`, and `README.md`.
+- [x] `npm run build` emits ESM JS and `.d.ts` into `dist/`. `npm run typecheck` covers `src/` and `test/`.
+- [x] `npm test` runs Vitest with at least one passing smoke test that imports from `src/index.ts`.
+- [x] The root `README.md` lists `potato-sdk/`.

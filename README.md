@@ -8,6 +8,7 @@ A monorepo containing a web application and its supporting planning docs.
 |----------------------------------------|---------|
 | [`potato-api/`](potato-api/)           | Backend REST API: TypeScript, Hono, Drizzle ORM, MySQL. |
 | [`potato-ui/`](potato-ui/)             | Frontend SPA: React, TypeScript, Vite, Vitest. |
+| [`potato-sdk/`](potato-sdk/)           | Server-side Node.js SDK: signs requests and fetches evaluated flags. Zero runtime deps. |
 | [`potato-planning/`](potato-planning/) | Planning docs and the in-repo task tracker. |
 
 ## Design docs
