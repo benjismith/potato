@@ -16,6 +16,8 @@ epic: "000002"
 
 `POST /sdk/v1/evaluate` behind the signature middleware. Body: `{ "subject": { "key": string, "attributes"?: object } }`. Response: `{ "flags": { "<flagKey>": <value>, ... } }`, evaluated for the signing key's environment using the v1 algorithm in DATA-MODEL.md (off → off variation, target → targeted variation, otherwise the default variation). Archived flags are excluded.
 
+Error responses use the shared shape `{ error, message, details? }`. An invalid body gets `400` with `error: "validation_failed"` and `details: { issues: [{ path, message }] }`, matching the management API. A successful response is always a JSON object `{ "flags": { … } }`, whose values are the variations' raw JSON values.
+
 Upsert the subject (`first_seen_at`, `last_seen_at`, `attributes`) on each call. Put the evaluation logic in a pure function, `evaluateFlags(flags, configs, targets, subjectKey)`, that is unit-tested without a database.
 
 ## Acceptance criteria

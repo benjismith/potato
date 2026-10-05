@@ -60,12 +60,24 @@ organizations ──< org_members >── users
   `environments.slug`, `flags.key`) match `^[a-z0-9][a-z0-9-_.]{0,63}$` and are
   immutable once created, because SDK callers and URLs depend on them.
 - **Timestamps:** every table has `created_at`, and mutable tables have
-  `updated_at`, both `datetime(3)` in UTC.
+  `updated_at`, both `datetime(3)` in UTC. SQL defaults use
+  `utc_timestamp(3)`, and the application sets `updated_at` on writes. MySQL's
+  `ON UPDATE CURRENT_TIMESTAMP` isn't used, because it follows the session time
+  zone.
 - **Soft deletion:** flags are archived (`archived_at`), and signing keys are
   revoked (`revoked_at`). Both stay in place for audit, and are excluded from
   evaluation and verification.
-- **Foreign keys** are declared with `ON DELETE CASCADE` from child to parent.
-  v1 exposes no hard deletes for orgs, apps, or environments.
+- **Foreign keys** from child to parent (e.g. environment → application) use
+  `ON DELETE CASCADE`. References to **users** as an actor (`created_by`,
+  `updated_by`) use `NO ACTION`, because deleting a user must not delete the
+  flags and keys they created. v1 exposes no hard deletes for orgs, apps, or
+  environments.
+- **Subject keys are case-sensitive.** `subjects.key` and
+  `flag_targets.subject_key` use the `utf8mb4_bin` collation, so `User1` and
+  `user1` are different subjects.
+- **Lookup indexes** exist on every foreign key used for "list children"
+  queries (`flag_variations.flag_id`, `signing_keys.environment_id`,
+  `flag_configs.environment_id`, `flag_targets.environment_id`).
 - **Tenant isolation:** every management query is scoped through the
   org → application chain, and must verify the current user is a member of the
   org. Every SDK request is scoped by the signing key, which determines the
@@ -171,8 +183,14 @@ without downtime. Private keys are **never** sent to or stored by Potato.
 
 A flag has at least two variations. A `boolean` flag has exactly two, `true`
 and `false`, created automatically. Variations are referenced by ID, never by
-position, so reordering or editing them can't re-point configs or targets. A
-variation that is referenced by any config or target can't be deleted.
+position, so reordering or editing them can't re-point configs or targets.
+
+Variation foreign keys cascade (deleting a flag deletes its variations,
+configs, and targets). MySQL won't allow `RESTRICT` here, because of how the
+cascade is ordered. So the rule "a variation referenced by a config or target
+can't be deleted" is **enforced by the API**, not the database. v1 has no
+variation-editing endpoint, so nothing can delete a variation yet. The API also
+enforces that a config's or target's variation belongs to the same flag.
 
 ### `flag_configs`
 

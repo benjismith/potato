@@ -97,7 +97,8 @@ deliberately share `unknown_key`, so a caller can't distinguish them.
 
 Other limits:
 
-- The request body is capped at **64 KiB** (`413` beyond that). The verifier
+- The request body is capped at **64 KiB**. Larger bodies get `413` with
+  `{ "error": "payload_too_large", "message": "…" }`. The verifier
   reads the raw bytes once, hashes them, and hands the same bytes to the
   handler.
 - The nonce window (600 s) is longer than the timestamp window (±300 s), so
