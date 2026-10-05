@@ -2,7 +2,7 @@
 id: "000009"
 title: Add the SDK evaluation endpoint
 type: task
-status: open
+status: done
 priority: P0
 created: 2026-10-05
 updated: 2026-10-05
@@ -22,9 +22,9 @@ Upsert the subject (`first_seen_at`, `last_seen_at`, `attributes`) on each call.
 
 ## Acceptance criteria
 
-- [ ] Pure evaluation unit tests: disabled → off variation, enabled → default, targeted subject → target variation, archived flag omitted.
-- [ ] Integration test: register the test-vector public key in an environment, send a request signed with the test private key and a fresh timestamp and nonce, and get correct values back.
-- [ ] Tenant isolation test: a key from environment A never returns environment B's state, even for the same app's flags (B's configs differ from A's).
-- [ ] Invalid bodies (missing or empty `subject.key`, key > 255 chars) get `400`.
-- [ ] The subject row is created on first evaluation, and `last_seen_at` updates on later ones.
-- [ ] `npm run typecheck` and `npm test` pass.
+- [x] Pure evaluation unit tests: disabled → off variation, enabled → default, targeted subject → target variation, archived flag omitted.
+- [x] Integration test: register the test-vector public key in an environment, send a request signed with the test private key and a fresh timestamp and nonce, and get correct values back.
+- [x] Tenant isolation test: a key from environment A never returns environment B's state, even for the same app's flags (B's configs differ from A's).
+- [x] Invalid bodies (missing or empty `subject.key`, key > 255 chars) get `400`.
+- [x] The subject row is created on first evaluation, and `last_seen_at` updates on later ones.
+- [x] `npm run typecheck` and `npm test` pass.
