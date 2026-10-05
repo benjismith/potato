@@ -10,6 +10,11 @@ A monorepo containing a web application and its supporting planning docs.
 | [`potato-ui/`](potato-ui/)             | Frontend SPA: React, TypeScript, Vite, Vitest. |
 | [`potato-planning/`](potato-planning/) | Planning docs and the in-repo task tracker. |
 
+## Design docs
+
+- [Data model](potato-planning/docs/DATA-MODEL.md): tenants, flags, environments, subjects, and v1 evaluation.
+- [Request signing](potato-planning/docs/SIGNING.md): how SDK requests are signed with Ed25519 and verified.
+
 ## Workflow
 
 Development work is planned and tracked as Markdown task files under

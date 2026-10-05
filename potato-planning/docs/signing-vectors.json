@@ -1,0 +1,41 @@
+{
+  "description": "Test vectors for the Potato request-signing scheme (see SIGNING.md). TEST-ONLY KEY: never use outside tests.",
+  "keyId": "key_01JZZTESTKEY00000000000000",
+  "privateKeyPem": "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIAABAgMEBQYHCAkKCwwNDg8QERITFBUWFxgZGhscHR4f\n-----END PRIVATE KEY-----\n",
+  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAA6EHv/POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg=\n-----END PUBLIC KEY-----\n",
+  "cases": [
+    {
+      "name": "evaluate-post",
+      "method": "POST",
+      "path": "/sdk/v1/evaluate",
+      "timestamp": "1767225600",
+      "nonce": "bm9uY2UtMDAwMDAwMDAx",
+      "body": "{\"subject\":{\"key\":\"alice\"}}",
+      "bodySha256": "6c819774e2e393941e2b16c351dfcf57f9ef930c5415464f6e1b8f7be37d262a",
+      "canonical": "POTATO-ED25519-V1\nkey_01JZZTESTKEY00000000000000\nPOST\n/sdk/v1/evaluate\n1767225600\nbm9uY2UtMDAwMDAwMDAx\n6c819774e2e393941e2b16c351dfcf57f9ef930c5415464f6e1b8f7be37d262a",
+      "signature": "DYzV8-YB4P4wMybQ3A1KRudlppvQw-9WSbMuin-bT-APv3Rtlm1lXfEj2032NblktYZP8oqRsuw_aMrK006tCg"
+    },
+    {
+      "name": "get-with-query-empty-body",
+      "method": "GET",
+      "path": "/sdk/v1/example?b=2&a=1",
+      "timestamp": "1767225601",
+      "nonce": "bm9uY2UtMDAwMDAwMDAy",
+      "body": "",
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "canonical": "POTATO-ED25519-V1\nkey_01JZZTESTKEY00000000000000\nGET\n/sdk/v1/example?b=2&a=1\n1767225601\nbm9uY2UtMDAwMDAwMDAy\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "signature": "R1zwt_itAwCME6nkdNp-3FdydGf1_uOjsE85ipJUqcWXe_e1FcUn1HUHsOm_LxX0G52mgfmvu_Mt_dSDhY_DAw"
+    },
+    {
+      "name": "unicode-body",
+      "method": "POST",
+      "path": "/sdk/v1/evaluate",
+      "timestamp": "1767225602",
+      "nonce": "bm9uY2UtMDAwMDAwMDAz",
+      "body": "{\"subject\":{\"key\":\"土豆\",\"attributes\":{\"name\":\"José\"}}}",
+      "bodySha256": "425ac6f86e8cc3873c1d82691275e7b782f69102e76b6d32b4c14c6ac6e414d1",
+      "canonical": "POTATO-ED25519-V1\nkey_01JZZTESTKEY00000000000000\nPOST\n/sdk/v1/evaluate\n1767225602\nbm9uY2UtMDAwMDAwMDAz\n425ac6f86e8cc3873c1d82691275e7b782f69102e76b6d32b4c14c6ac6e414d1",
+      "signature": "9Yr-dUG5XX7ry4eCGb9WgPuCQT-nqPzt6DSlV7eZsBVXmd-5pAfnsEDur9-FU922QOXeJx8d9L6rFOgf5eqUBg"
+    }
+  ]
+}

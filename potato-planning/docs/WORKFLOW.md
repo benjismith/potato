@@ -13,14 +13,18 @@ potato-planning/
 │   └── WORKFLOW.md          ← this document
 └── tasks/
     ├── next-id              ← next available task ID
+    ├── epics/               ← cross-project epics
+    │   ├── open/
+    │   ├── in-progress/
+    │   └── done/
     ├── potato-api/          ← one dir per sub-project
     │   ├── open/
     │   ├── in-progress/
     │   └── done/
+    ├── potato-sdk/
+    │   └── …
     └── potato-ui/
-        ├── open/
-        ├── in-progress/
-        └── done/
+        └── …
 ```
 
 Each sub-project gets its own directory under `tasks/`, and each of those has
@@ -28,6 +32,9 @@ one subdirectory per status: `open`, `in-progress`, and `done`. A task's
 location on disk always reflects its current status. If a new sub-project is
 added to the monorepo, add a matching `tasks/<sub-project>/{open,in-progress,done}`
 tree for it.
+
+**Epics** span sub-projects, so they live in `tasks/epics/` rather than under
+any one project. They use the same file format and lifecycle as other tasks.
 
 ## Task IDs
 
@@ -66,6 +73,7 @@ priority: P2
 created: 2026-10-05
 updated: 2026-10-05
 depends_on: ["000000"]
+epic: "000001"
 ---
 
 # Add widget listing endpoint
@@ -93,13 +101,15 @@ design notes.
 | `created`    | `YYYY-MM-DD`                             | Set once, at creation. |
 | `updated`    | `YYYY-MM-DD`                             | Bump on every edit or status change. |
 | `depends_on` | List of task IDs, e.g. `["000000"]`      | `[]` if none. A task shouldn't start until its dependencies are `done`. |
+| `epic`       | Task ID of the parent epic               | Optional. Omitted on epics themselves and on standalone tasks. |
 
 ### Body
 
 1. A `#` heading with the short imperative title (e.g. "Set up the API
    sub-project").
 2. A `## Description` section explaining the work.
-3. A `## Acceptance criteria` section, as a Markdown checklist (`- [ ]`). Each
+3. An epic's description lists its child tasks in a table.
+4. A `## Acceptance criteria` section, as a Markdown checklist (`- [ ]`). Each
    criterion should be concrete and independently verifiable.
 
 ## Lifecycle
@@ -129,3 +139,19 @@ The front-matter `status` and the containing directory must always agree.
 - Treat the acceptance criteria as the definition of done.
 - Reference task IDs in commit messages (e.g. `[000000] Scaffold Hono API`).
 - Never hand-pick an ID; always allocate from `next-id` and increment it.
+- Design docs live alongside this one: [DATA-MODEL.md](DATA-MODEL.md) and
+  [SIGNING.md](SIGNING.md). Follow them, and update them in the same commit if
+  a task changes the design.
+
+### Parallel agents
+
+Several agents may work in the same checkout at once, each on its own
+sub-project. To avoid stepping on each other:
+
+- Only edit files inside your assigned sub-project, plus your own task files.
+- Commit with explicit paths (`git add potato-sdk/ potato-planning/tasks/…`),
+  never `git add -A`. If `git commit` fails on `index.lock`, wait a moment and
+  retry.
+- Don't create new tasks (that would race on `next-id`). Report proposed
+  follow-up work to the coordinating agent instead.
+- Don't push. The coordinator pushes.
