@@ -14,6 +14,7 @@ A monorepo containing a web application and its supporting planning docs.
 ## Design docs
 
 - [Data model](potato-planning/docs/DATA-MODEL.md): tenants, flags, environments, subjects, and v1 evaluation.
+- [Management API](potato-planning/docs/API.md): the `/v1` contract between `potato-api` and `potato-ui`.
 - [Request signing](potato-planning/docs/SIGNING.md): how SDK requests are signed with Ed25519 and verified.
 
 ## Workflow
