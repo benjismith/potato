@@ -29,6 +29,7 @@ Then check `http://localhost:3000/health`.
 |----------------|---------|-------------|
 | `PORT`         | `3000`  | Port the HTTP server listens on. |
 | `DATABASE_URL` | none    | MySQL connection string, e.g. `mysql://root@localhost:3306/potato`. Required. |
+| `TEST_DATABASE_URL` | none | MySQL database for integration tests, e.g. `mysql://root@localhost:3306/potato_test`. Required by `npm test`. Its name must end in `_test`. |
 
 Variables are read from `.env` (git-ignored) if present. Real environment
 variables take precedence over `.env`.
@@ -46,6 +47,25 @@ variables take precedence over `.env`.
 | `npm run db:migrate`  | Apply pending migrations to `DATABASE_URL`. |
 | `npm run db:studio`   | Open Drizzle Studio to browse the database. |
 
+## Database
+
+The schema lives in `src/db/schema.ts` and implements
+[DATA-MODEL.md](../potato-planning/docs/DATA-MODEL.md). After changing it, run
+`npm run db:generate -- --name <what_changed>` to write a new migration into
+`drizzle/`, then `npm run db:migrate`.
+
+All `datetime(3)` columns hold UTC. The mysql2 pool uses `timezone: "Z"`, SQL
+defaults use `utc_timestamp(3)`, and Drizzle refreshes `updated_at` on every
+update.
+
+## Tests
+
+`npm test` runs Vitest. Before the suite starts, `test/support/global-setup.ts`
+creates the `TEST_DATABASE_URL` database if needed and applies all migrations
+to it. Integration tests call `useTestDb()` (from `test/support/db.ts`), which
+gives them a Drizzle client and truncates every table before each test. Test
+files run one at a time because they share that database.
+
 ## Layout
 
 ```
@@ -55,10 +75,12 @@ src/
 ├── env.ts            # Environment variable parsing and validation
 ├── db/
 │   ├── client.ts     # Drizzle + mysql2 pool, and pingDb()
-│   └── schema.ts     # Drizzle table definitions
+│   ├── migrate.ts    # migrateDb(): applies ./drizzle migrations programmatically
+│   └── schema.ts     # Drizzle table definitions and relations
 └── routes/
     └── health.ts     # GET /health
 test/                 # Vitest tests (use Hono's app.request())
+└── support/          # Test DB global setup and the useTestDb() helper
 drizzle/              # Generated migrations
 ```
 

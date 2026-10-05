@@ -4,7 +4,12 @@ import mysql from "mysql2/promise";
 import * as schema from "./schema.js";
 
 export function createDb(databaseUrl: string) {
-  const pool = mysql.createPool({ uri: databaseUrl, connectionLimit: 10 });
+  // timezone "Z": datetime columns hold UTC, so read and write them as UTC.
+  const pool = mysql.createPool({
+    uri: databaseUrl,
+    connectionLimit: 10,
+    timezone: "Z",
+  });
   const db = drizzle({ client: pool, schema, mode: "default" });
   return { db, pool };
 }
