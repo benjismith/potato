@@ -19,13 +19,20 @@ import {
   uniqueIndex,
   varchar,
 } from "drizzle-orm/mysql-core";
+import { newId, type IdPrefix } from "../ids.js";
 
 // ---------------------------------------------------------------------------
 // Column helpers
 // ---------------------------------------------------------------------------
 
-/** A prefixed-ULID primary key, e.g. `org_01J9Z…`. */
-const idColumn = () => varchar("id", { length: 30 }).primaryKey();
+/**
+ * A prefixed-ULID primary key, e.g. `org_01J9Z…`. Drizzle generates one on
+ * insert if the caller doesn't supply it.
+ */
+const idColumn = (prefix: IdPrefix) =>
+  varchar("id", { length: 30 })
+    .primaryKey()
+    .$defaultFn(() => newId(prefix));
 
 /** A foreign-key column holding a prefixed ULID. */
 const ref = (name: string) => varchar(name, { length: 30 });
@@ -73,7 +80,7 @@ const cascade = { onDelete: "cascade" } as const;
 export const organizations = mysqlTable(
   "organizations",
   {
-    id: idColumn(),
+    id: idColumn("org"),
     slug: varchar("slug", { length: 64 }).notNull(),
     name: varchar("name", { length: 255 }).notNull(),
     createdAt: createdAt(),
@@ -85,7 +92,7 @@ export const organizations = mysqlTable(
 export const users = mysqlTable(
   "users",
   {
-    id: idColumn(),
+    id: idColumn("usr"),
     email: varchar("email", { length: 255 }).notNull(),
     name: varchar("name", { length: 255 }).notNull(),
     createdAt: createdAt(),
@@ -118,7 +125,7 @@ export const orgMembers = mysqlTable(
 export const applications = mysqlTable(
   "applications",
   {
-    id: idColumn(),
+    id: idColumn("app"),
     orgId: ref("org_id")
       .notNull()
       .references(() => organizations.id, cascade),
@@ -133,7 +140,7 @@ export const applications = mysqlTable(
 export const environments = mysqlTable(
   "environments",
   {
-    id: idColumn(),
+    id: idColumn("env"),
     applicationId: ref("application_id")
       .notNull()
       .references(() => applications.id, cascade),
@@ -156,7 +163,7 @@ export type SigningAlgorithm = (typeof signingAlgorithms)[number];
 export const signingKeys = mysqlTable(
   "signing_keys",
   {
-    id: idColumn(),
+    id: idColumn("key"),
     environmentId: ref("environment_id")
       .notNull()
       .references(() => environments.id, cascade),
@@ -181,7 +188,7 @@ export type FlagType = (typeof flagTypes)[number];
 export const flags = mysqlTable(
   "flags",
   {
-    id: idColumn(),
+    id: idColumn("flg"),
     applicationId: ref("application_id")
       .notNull()
       .references(() => applications.id, cascade),
@@ -202,7 +209,7 @@ export const flags = mysqlTable(
 export const flagVariations = mysqlTable(
   "flag_variations",
   {
-    id: idColumn(),
+    id: idColumn("var"),
     flagId: ref("flag_id")
       .notNull()
       .references(() => flags.id, cascade),
@@ -282,6 +289,22 @@ export const subjects = mysqlTable(
   },
   (t) => [primaryKey({ columns: [t.environmentId, t.key] })],
 );
+
+// ---------------------------------------------------------------------------
+// Row types
+// ---------------------------------------------------------------------------
+
+export type Organization = typeof organizations.$inferSelect;
+export type User = typeof users.$inferSelect;
+export type OrgMember = typeof orgMembers.$inferSelect;
+export type Application = typeof applications.$inferSelect;
+export type Environment = typeof environments.$inferSelect;
+export type SigningKey = typeof signingKeys.$inferSelect;
+export type Flag = typeof flags.$inferSelect;
+export type FlagVariation = typeof flagVariations.$inferSelect;
+export type FlagConfig = typeof flagConfigs.$inferSelect;
+export type FlagTarget = typeof flagTargets.$inferSelect;
+export type Subject = typeof subjects.$inferSelect;
 
 // ---------------------------------------------------------------------------
 // Relations (for `db.query.*`)

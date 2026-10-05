@@ -18,6 +18,7 @@ for HTTP routing and [Drizzle ORM](https://orm.drizzle.team/) with MySQL.
 npm install
 cp .env.example .env   # then adjust DATABASE_URL if needed
 npm run db:migrate
+npm run db:seed
 npm run dev
 ```
 
@@ -29,6 +30,7 @@ Then check `http://localhost:3000/health`.
 |----------------|---------|-------------|
 | `PORT`         | `3000`  | Port the HTTP server listens on. |
 | `DATABASE_URL` | none    | MySQL connection string, e.g. `mysql://root@localhost:3306/potato`. Required. |
+| `POTATO_CURRENT_USER_ID` | seeded user | The user every management request is authenticated as (v1 has no login). Defaults to `usr_0000000000000000000000SEED`, created by `npm run db:seed`. |
 | `TEST_DATABASE_URL` | none | MySQL database for integration tests, e.g. `mysql://root@localhost:3306/potato_test`. Required by `npm test`. Its name must end in `_test`. |
 
 Variables are read from `.env` (git-ignored) if present. Real environment
@@ -45,6 +47,7 @@ variables take precedence over `.env`.
 | `npm test`            | Run the Vitest suite once (`npm run test:watch` to watch). |
 | `npm run db:generate` | Generate SQL migrations in `drizzle/` from `src/db/schema.ts`. |
 | `npm run db:migrate`  | Apply pending migrations to `DATABASE_URL`. |
+| `npm run db:seed`     | Create the seed user, org, app, and environments if missing (idempotent). |
 | `npm run db:studio`   | Open Drizzle Studio to browse the database. |
 
 ## Database
@@ -57,6 +60,31 @@ The schema lives in `src/db/schema.ts` and implements
 All `datetime(3)` columns hold UTC. The mysql2 pool uses `timezone: "Z"`, SQL
 defaults use `utc_timestamp(3)`, and Drizzle refreshes `updated_at` on every
 update.
+
+### IDs and seed data
+
+Primary keys are prefixed ULIDs from `newId(prefix)` in `src/ids.ts` (e.g.
+`newId("org")` → `org_01J9Z…`). Drizzle fills them in on insert when omitted.
+
+`npm run db:seed` creates one user (`you@example.com`), one org (`default`)
+with that user as `owner`, and one app (`demo`) with `development` and
+`production` environments. The rows have fixed IDs (see `SEED_IDS` in
+`src/db/seed.ts`), and existing rows are left alone, so it's safe to re-run.
+
+## Authentication (v1 stub)
+
+There is no login yet. Management routes (`/v1/…`) use the `currentUser`
+middleware (`src/auth/current-user.ts`), which loads `POTATO_CURRENT_USER_ID`
+and exposes it as `c.get("currentUser")`, or responds `401` if that user
+doesn't exist.
+
+Handlers load tenant resources through the membership guards in
+`src/auth/membership.ts` (`loadOrg`, `loadApplication`, `loadEnvironment`).
+Each returns the row only if the current user is a member of the owning org,
+and otherwise throws a `404`, so other tenants' IDs look like IDs that don't
+exist.
+
+Errors are JSON: `{ "error": "not_found", "message": "Organization not found" }`.
 
 ## Tests
 
@@ -71,11 +99,19 @@ files run one at a time because they share that database.
 ```
 src/
 ├── index.ts          # Entry point: loads env, creates the DB pool, starts the server
+├── seed.ts           # Entry point for `npm run db:seed`
+├── ids.ts            # newId(prefix): prefixed ULIDs
 ├── app.ts            # createApp(deps): builds the Hono app (deps injected for tests)
 ├── env.ts            # Environment variable parsing and validation
+├── auth/
+│   ├── current-user.ts  # currentUser middleware (v1 stub)
+│   └── membership.ts    # loadOrg/loadApplication/loadEnvironment guards
+├── http/
+│   └── errors.ts     # apiError(): JSON error responses
 ├── db/
 │   ├── client.ts     # Drizzle + mysql2 pool, and pingDb()
 │   ├── migrate.ts    # migrateDb(): applies ./drizzle migrations programmatically
+│   ├── seed.ts       # seedDb() and SEED_IDS
 │   └── schema.ts     # Drizzle table definitions and relations
 └── routes/
     └── health.ts     # GET /health
