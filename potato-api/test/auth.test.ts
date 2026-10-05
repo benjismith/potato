@@ -3,15 +3,9 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { currentUser, type ManagementEnv } from "../src/auth/current-user.js";
 import { loadApplication, loadEnvironment, loadOrg } from "../src/auth/membership.js";
 import type { Db } from "../src/db/client.js";
-import {
-  applications,
-  environments,
-  orgMembers,
-  organizations,
-  users,
-} from "../src/db/schema.js";
 import { newId } from "../src/ids.js";
 import { useTestDb } from "./support/db.js";
+import { createTenant } from "./support/fixtures.js";
 
 const testDb = useTestDb();
 
@@ -30,20 +24,6 @@ function managementApp(db: Db, currentUserId: string) {
     c.json(await loadEnvironment(db, c.get("currentUser").id, c.req.param("id"))),
   );
   return app;
-}
-
-/** Creates a user who is the sole member of an org with one app and env. */
-async function createTenant(db: Db, name: string) {
-  const user = { id: newId("usr"), email: `${name}@example.com`, name };
-  const org = { id: newId("org"), slug: name, name };
-  const app = { id: newId("app"), orgId: org.id, slug: "web", name: "Web" };
-  const env = { id: newId("env"), applicationId: app.id, slug: "production", name: "Production" };
-  await db.insert(users).values(user);
-  await db.insert(organizations).values(org);
-  await db.insert(orgMembers).values({ orgId: org.id, userId: user.id, role: "member" });
-  await db.insert(applications).values(app);
-  await db.insert(environments).values(env);
-  return { userId: user.id, orgId: org.id, appId: app.id, envId: env.id };
 }
 
 describe("currentUser middleware", () => {

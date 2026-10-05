@@ -1,5 +1,5 @@
 import { and, eq, getTableColumns } from "drizzle-orm";
-import type { Db } from "../db/client.js";
+import type { Executor } from "../db/client.js";
 import {
   applications,
   environments,
@@ -9,14 +9,14 @@ import {
   type Environment,
   type Organization,
 } from "../db/schema.js";
-import { apiError } from "../http/errors.js";
+import { notFound } from "../http/errors.js";
 
 // Membership guards. Each loads a resource by ID only if `userId` is a member
 // of the org that owns it, and otherwise throws a 404 (never 403), so another
 // tenant's IDs are indistinguishable from IDs that don't exist.
 
 /** Loads an org the user belongs to, or throws `404`. */
-export async function loadOrg(db: Db, userId: string, orgId: string): Promise<Organization> {
+export async function loadOrg(db: Executor, userId: string, orgId: string): Promise<Organization> {
   const [org] = await db
     .select(getTableColumns(organizations))
     .from(organizations)
@@ -32,7 +32,7 @@ export async function loadOrg(db: Db, userId: string, orgId: string): Promise<Or
 
 /** Loads an application in an org the user belongs to, or throws `404`. */
 export async function loadApplication(
-  db: Db,
+  db: Executor,
   userId: string,
   applicationId: string,
 ): Promise<Application> {
@@ -51,7 +51,7 @@ export async function loadApplication(
 
 /** Loads an environment in an org the user belongs to, or throws `404`. */
 export async function loadEnvironment(
-  db: Db,
+  db: Executor,
   userId: string,
   environmentId: string,
 ): Promise<Environment> {
@@ -69,6 +69,3 @@ export async function loadEnvironment(
   return env;
 }
 
-function notFound(resource: string) {
-  return apiError(404, "not_found", `${resource} not found`);
-}

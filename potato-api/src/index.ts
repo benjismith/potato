@@ -5,7 +5,11 @@ import { loadEnv } from "./env.js";
 
 const env = loadEnv();
 const { db, pool } = createDb(env.databaseUrl);
-const app = createApp({ pingDb: () => pingDb(db) });
+const app = createApp({
+  pingDb: () => pingDb(db),
+  db,
+  currentUserId: env.currentUserId,
+});
 
 const server = serve({ fetch: app.fetch, port: env.port }, (info) => {
   console.log(`potato-api listening on http://localhost:${info.port}`);

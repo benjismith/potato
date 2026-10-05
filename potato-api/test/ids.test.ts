@@ -50,3 +50,12 @@ describe("isId", () => {
     expect(isId(id.toLowerCase())).toBe(false);
   });
 });
+
+describe("ulid monotonicity", () => {
+  it("sorts IDs generated within the same millisecond in generation order", () => {
+    const now = Date.now() + 10_000; // ahead of any earlier call
+    const ids = Array.from({ length: 1_000 }, () => ulid(now));
+    expect([...ids].sort()).toEqual(ids);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+});

@@ -73,7 +73,7 @@ with that user as `owner`, and one app (`demo`) with `development` and
 
 ## Authentication (v1 stub)
 
-There is no login yet. Management routes (`/v1/…`) use the `currentUser`
+There is no login yet. Every management route (`/v1/…`) runs the `currentUser`
 middleware (`src/auth/current-user.ts`), which loads `POTATO_CURRENT_USER_ID`
 and exposes it as `c.get("currentUser")`, or responds `401` if that user
 doesn't exist.
@@ -85,6 +85,8 @@ and otherwise throws a `404`, so other tenants' IDs look like IDs that don't
 exist.
 
 Errors are JSON: `{ "error": "not_found", "message": "Organization not found" }`.
+A `400 validation_failed` error's `details` is
+`{ "issues": [{ "path": "slug", "message": "…" }] }`.
 
 ## Tests
 
@@ -106,15 +108,19 @@ src/
 ├── auth/
 │   ├── current-user.ts  # currentUser middleware (v1 stub)
 │   └── membership.ts    # loadOrg/loadApplication/loadEnvironment guards
+├── domain/           # Business rules shared by routes (environment creation, flag defaults)
 ├── http/
-│   └── errors.ts     # apiError(): JSON error responses
+│   ├── errors.ts     # apiError(), onError/notFound handlers
+│   ├── serialize.ts  # Row → API resource shapes
+│   └── validation.ts # Zod schemas and the validate() middleware
 ├── db/
 │   ├── client.ts     # Drizzle + mysql2 pool, and pingDb()
 │   ├── migrate.ts    # migrateDb(): applies ./drizzle migrations programmatically
 │   ├── seed.ts       # seedDb() and SEED_IDS
 │   └── schema.ts     # Drizzle table definitions and relations
 └── routes/
-    └── health.ts     # GET /health
+    ├── health.ts     # GET /health
+    └── v1/           # Management API (see API.md)
 test/                 # Vitest tests (use Hono's app.request())
 └── support/          # Test DB global setup and the useTestDb() helper
 drizzle/              # Generated migrations
@@ -131,3 +137,10 @@ database answered a trivial query:
 { "status": "ok", "database": "ok" }
 { "status": "ok", "database": "error", "error": "connect ECONNREFUSED ..." }
 ```
+
+### Management API (`/v1`)
+
+Implements the contract in
+[API.md](../potato-planning/docs/API.md): `GET /v1/me`, apps
+(`/v1/orgs/:orgId/apps`, `/v1/apps/:appId`), and environments
+(`/v1/apps/:appId/environments`).
