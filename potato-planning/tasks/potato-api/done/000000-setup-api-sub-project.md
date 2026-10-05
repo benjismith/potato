@@ -2,7 +2,7 @@
 id: "000000"
 title: Set up the API sub-project
 type: task
-status: open
+status: done
 priority: P0
 created: 2026-10-05
 updated: 2026-10-05
@@ -32,20 +32,20 @@ prove the end-to-end wiring (Hono route → Drizzle query → MySQL) works.
 
 ## Acceptance criteria
 
-- [ ] `potato-api/` contains a `package.json`, `tsconfig.json` (strict mode),
+- [x] `potato-api/` contains a `package.json`, `tsconfig.json` (strict mode),
       and `src/` directory with an entry point that starts a Hono server.
-- [ ] `npm run dev` starts the API in watch mode on a configurable port
+- [x] `npm run dev` starts the API in watch mode on a configurable port
       (default `3000`).
-- [ ] `npm run build` compiles cleanly with `tsc`, and `npm start` runs the
+- [x] `npm run build` compiles cleanly with `tsc`, and `npm start` runs the
       compiled output.
-- [ ] `GET /health` returns `200` with a JSON body that reports API status and
+- [x] `GET /health` returns `200` with a JSON body that reports API status and
       whether the database connection succeeds.
-- [ ] Drizzle is configured (`drizzle.config.ts`, `src/db/schema.ts`,
+- [x] Drizzle is configured (`drizzle.config.ts`, `src/db/schema.ts`,
       `src/db/client.ts`) against MySQL, and `npm run db:generate` /
       `npm run db:migrate` scripts exist and work.
-- [ ] The API connects to the existing local MySQL server, and `.env.example`
+- [x] The API connects to the existing local MySQL server, and `.env.example`
       documents all required environment variables.
-- [ ] `npm test` runs Vitest, with at least one passing test that exercises the
+- [x] `npm test` runs Vitest, with at least one passing test that exercises the
       `/health` route via Hono's `app.request()` test helper.
-- [ ] `potato-api/README.md` documents setup, scripts, and environment
+- [x] `potato-api/README.md` documents setup, scripts, and environment
       variables.

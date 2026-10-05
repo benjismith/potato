@@ -2,7 +2,7 @@
 id: "000001"
 title: Set up the UI sub-project
 type: task
-status: open
+status: in-progress
 priority: P0
 created: 2026-10-05
 updated: 2026-10-05
