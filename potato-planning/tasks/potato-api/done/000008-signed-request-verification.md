@@ -2,7 +2,7 @@
 id: "000008"
 title: Add signed-request verification middleware
 type: task
-status: open
+status: done
 priority: P0
 created: 2026-10-05
 updated: 2026-10-05
@@ -20,9 +20,9 @@ Structure it as a pure core: `buildCanonicalString(...)`, plus `verifyRequest(re
 
 ## Acceptance criteria
 
-- [ ] Tests load `potato-planning/docs/signing-vectors.json`. Every case's canonical string is reproduced exactly, and its signature verifies against `publicKeyPem` (with an injected clock).
-- [ ] Altering any single field (method, target, timestamp, nonce, one body byte) makes verification fail with `bad_signature` (tested per field).
-- [ ] Each failure `reason` in SIGNING.md's verification table has a test, including revoked keys (which report `unknown_key`) and a replayed nonce.
-- [ ] Nonces are recorded only after the signature verifies. A request with a bad signature does not consume its nonce (tested).
-- [ ] Bodies over 64 KiB get `413`. `last_used_at` updates at most once per minute per key.
-- [ ] `npm run typecheck` and `npm test` pass.
+- [x] Tests load `potato-planning/docs/signing-vectors.json`. Every case's canonical string is reproduced exactly, and its signature verifies against `publicKeyPem` (with an injected clock).
+- [x] Altering any single field (method, target, timestamp, nonce, one body byte) makes verification fail with `bad_signature` (tested per field).
+- [x] Each failure `reason` in SIGNING.md's verification table has a test, including revoked keys (which report `unknown_key`) and a replayed nonce.
+- [x] Nonces are recorded only after the signature verifies. A request with a bad signature does not consume its nonce (tested).
+- [x] Bodies over 64 KiB get `413`. `last_used_at` updates at most once per minute per key.
+- [x] `npm run typecheck` and `npm test` pass.
