@@ -59,7 +59,7 @@ export interface SignRequestOptions {
   nonce?: string;
 }
 
-const KEY_ID_RE = /^key_[0-9A-HJKMNP-TV-Z]{26}$/;
+export const KEY_ID_RE = /^key_[0-9A-HJKMNP-TV-Z]{26}$/;
 const NONCE_RE = /^[A-Za-z0-9_-]{16,64}$/;
 const TIMESTAMP_RE = /^(0|[1-9][0-9]*)$/;
 const SHA256_HEX_RE = /^[0-9a-f]{64}$/;

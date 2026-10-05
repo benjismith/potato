@@ -1,5 +1,12 @@
-/** The SDK's own version, kept in sync with package.json. */
-export const SDK_VERSION = "0.1.0";
+export {
+  SDK_VERSION,
+  EVALUATE_PATH,
+  DEFAULT_TIMEOUT_MS,
+  createPotatoClient,
+  PotatoError,
+  PotatoFlags,
+} from "./client.js";
+export type { FlagValue, PotatoClient, PotatoClientErrorCode, PotatoClientOptions, Subject } from "./client.js";
 
 export {
   SIGNING_VERSION,
