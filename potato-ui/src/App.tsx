@@ -1,53 +1,32 @@
-import { useEffect, useState } from 'react'
-import { fetchHealth, type Health } from './api/client'
+import { Navigate, Route, Routes } from 'react-router'
+import { Shell } from './components/Shell'
+import { EnvironmentLayout } from './pages/EnvironmentLayout'
+import { FlagListPage } from './pages/FlagListPage'
+import { NotFound } from './pages/NotFound'
+import { StartRedirect } from './pages/StartRedirect'
 
-type HealthState =
-  | { kind: 'loading' }
-  | { kind: 'loaded'; health: Health }
-  | { kind: 'failed'; message: string }
-
+/**
+ * The dashboard's routes. Rendered inside a router: <BrowserRouter> in
+ * main.tsx, or <MemoryRouter> in tests.
+ */
 function App() {
-  const [health, setHealth] = useState<HealthState>({ kind: 'loading' })
-
-  useEffect(() => {
-    let cancelled = false
-    fetchHealth()
-      .then((h) => !cancelled && setHealth({ kind: 'loaded', health: h }))
-      .catch((err: unknown) => {
-        if (cancelled) return
-        setHealth({ kind: 'failed', message: err instanceof Error ? err.message : String(err) })
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1>Potato</h1>
-      </header>
-      <main className="app-main">
-        <section aria-label="API status" className="status">
-          <h2>API status</h2>
-          <p role="status">{describe(health)}</p>
-        </section>
-      </main>
-    </div>
-  )
-}
+    <Routes>
+      <Route element={<Shell />}>
+        {/* These fill in the first org/app/environment, then redirect. */}
+        <Route index element={<StartRedirect />} />
+        <Route path="orgs/:orgId" element={<StartRedirect />} />
+        <Route path="orgs/:orgId/apps/:appId" element={<StartRedirect />} />
 
-function describe(state: HealthState): string {
-  switch (state.kind) {
-    case 'loading':
-      return 'Checking…'
-    case 'failed':
-      return `API unreachable: ${state.message}`
-    case 'loaded':
-      return state.health.database === 'ok'
-        ? 'API ok, database ok'
-        : `API ok, database error: ${state.health.error ?? 'unknown'}`
-  }
+        <Route path="orgs/:orgId/apps/:appId/envs/:envSlug" element={<EnvironmentLayout />}>
+          <Route index element={<Navigate to="flags" replace />} />
+          <Route path="flags" element={<FlagListPage />} />
+        </Route>
+
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
+  )
 }
 
 export default App
