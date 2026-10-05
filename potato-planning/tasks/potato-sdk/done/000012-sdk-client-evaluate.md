@@ -2,7 +2,7 @@
 id: "000012"
 title: Implement the SDK client and evaluate()
 type: task
-status: in-progress
+status: done
 priority: P1
 created: 2026-10-05
 updated: 2026-10-05
@@ -29,7 +29,7 @@ const on = flags.get("new-checkout", false); // typed, falls back to the given d
 - [x] Unit tests with a stubbed `fetch` check the URL, method, exact body bytes, and valid signature headers (verified with `node:crypto` against the matching public key).
 - [x] `401` responses surface the server's `reason` on `PotatoError`. Network errors and timeouts are wrapped too.
 - [x] `flags.get(key, fallback)` returns the fallback for unknown keys.
-- [ ] Integration test (skipped unless `POTATO_API_URL` is set) evaluates against a running `potato-api`.
+- [x] Integration test (skipped unless `POTATO_API_URL` is set) evaluates against a running `potato-api`.
 - [x] `npm run typecheck`, `npm test`, and `npm run build` pass.
 
 ## Notes
