@@ -1,4 +1,4 @@
-import type { App, Environment, Org, User } from '../api/types'
+import type { App, Environment, FlagDetail, Org, User } from '../api/types'
 
 const at = '2026-10-05T12:00:00.000Z'
 
@@ -36,3 +36,35 @@ export const tenancyRoutes = {
 }
 
 export const devFlagsPath = '/orgs/org_1/apps/app_1/envs/development/flags'
+
+/** A boolean flag with configs in both environments (off, version 1). */
+export function booleanFlag(overrides: Partial<FlagDetail> = {}): FlagDetail {
+  const id = overrides.id ?? 'flg_1'
+  const config = (environmentId: string) => ({
+    environmentId,
+    enabled: false,
+    offVariationId: `${id}_off`,
+    defaultVariationId: `${id}_on`,
+    version: 1,
+    updatedAt: at,
+    updatedBy: user.id,
+    targets: [],
+  })
+  return {
+    id,
+    applicationId: app.id,
+    key: 'new-checkout',
+    name: 'New checkout',
+    description: null,
+    type: 'boolean',
+    variations: [
+      { id: `${id}_on`, name: 'On', value: true, sortOrder: 0 },
+      { id: `${id}_off`, name: 'Off', value: false, sortOrder: 1 },
+    ],
+    configs: { [development.id]: config(development.id), [production.id]: config(production.id) },
+    createdAt: at,
+    updatedAt: at,
+    archivedAt: null,
+    ...overrides,
+  }
+}

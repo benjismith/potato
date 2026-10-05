@@ -1,7 +1,9 @@
 import { Navigate, Route, Routes } from 'react-router'
 import { Shell } from './components/Shell'
 import { EnvironmentLayout } from './pages/EnvironmentLayout'
+import { FlagDetailPage } from './pages/FlagDetailPage'
 import { FlagListPage } from './pages/FlagListPage'
+import { NewFlagPage } from './pages/NewFlagPage'
 import { NotFound } from './pages/NotFound'
 import { StartRedirect } from './pages/StartRedirect'
 
@@ -21,6 +23,8 @@ function App() {
         <Route path="orgs/:orgId/apps/:appId/envs/:envSlug" element={<EnvironmentLayout />}>
           <Route index element={<Navigate to="flags" replace />} />
           <Route path="flags" element={<FlagListPage />} />
+          <Route path="flags/new" element={<NewFlagPage />} />
+          <Route path="flags/:flagId" element={<FlagDetailPage />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

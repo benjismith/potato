@@ -42,7 +42,12 @@ The browser only ever talks to one origin, so no CORS setup is needed locally.
 |-----|------|
 | `/` | Redirects to the first org, app and environment. |
 | `/orgs/:orgId`, `/orgs/:orgId/apps/:appId` | Redirect to that org's/app's first environment. |
-| `/orgs/:orgId/apps/:appId/envs/:envSlug/flags` | Flags in that environment. |
+| `/orgs/:orgId/apps/:appId/envs/:envSlug/flags` | Flag list, with on/off toggles for that environment. `?archived=true` includes archived flags. |
+| `…/flags/new` | Create a flag (boolean, or string/number/JSON with a variations editor). |
+| `…/flags/:flagId` | Flag detail: on/off and served variations in that environment, name/description, archive/unarchive. |
+
+Config writes (toggles, variation choices) are optimistic and send the
+config `version`. On a `409` the page refetches and explains the conflict.
 
 The header shows the current user (`GET /v1/me`); the bar below it switches
 org, app and environment. Switching environment keeps you on the same page.
@@ -56,6 +61,7 @@ src/
 ├── App.tsx           # Route table
 ├── api/              # Typed API client (one function per endpoint; see potato-planning/docs/API.md)
 ├── components/       # Shared UI: Shell (frame), ContextBar (switchers), Status (loading/error)
+├── flags/            # Flag-specific components, helpers and the useConfigWriter hook
 ├── pages/            # One component per route
 ├── hooks/useAsync.ts # Loading/error/data state for an API call
 ├── me.ts, env.ts     # Context hooks: useMe() (current user), useEnv() (org/app/environment)

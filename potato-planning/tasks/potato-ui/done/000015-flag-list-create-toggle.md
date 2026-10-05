@@ -2,7 +2,7 @@
 id: "000015"
 title: Add flag list, creation, and per-environment toggles
 type: task
-status: open
+status: done
 priority: P1
 created: 2026-10-05
 updated: 2026-10-05
@@ -23,8 +23,8 @@ The flags page for the selected app and environment:
 
 ## Acceptance criteria
 
-- [ ] A boolean flag can be created, toggled, and archived entirely from the UI.
-- [ ] Toggling is optimistic and rolls back on error. A `409` shows a conflict message and refreshes.
-- [ ] Client-side key validation matches the API's pattern.
-- [ ] RTL tests cover create, toggle, and the `409` path (with mocked API calls).
-- [ ] `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build` pass.
+- [x] A boolean flag can be created, toggled, and archived entirely from the UI.
+- [x] Toggling is optimistic and rolls back on error. A `409` shows a conflict message and refreshes.
+- [x] Client-side key validation matches the API's pattern.
+- [x] RTL tests cover create, toggle, and the `409` path (with mocked API calls).
+- [x] `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build` pass.
