@@ -15,3 +15,29 @@ export function defaultConfigVariations(variations: readonly { id: string }[]): 
   }
   return { offVariationId: last.id, defaultVariationId: first.id };
 }
+
+/** The variations every new boolean flag gets (API.md). */
+export const BOOLEAN_VARIATIONS = [
+  { name: "On", value: true },
+  { name: "Off", value: false },
+] as const;
+
+/**
+ * Returns an error message if `value` doesn't match the flag type, or `null`
+ * if it does. `json` flags accept any JSON value.
+ */
+export function variationValueError(
+  type: "boolean" | "string" | "number" | "json",
+  value: unknown,
+): string | null {
+  switch (type) {
+    case "boolean":
+      return typeof value === "boolean" ? null : "Must be a boolean";
+    case "string":
+      return typeof value === "string" ? null : "Must be a string";
+    case "number":
+      return typeof value === "number" && Number.isFinite(value) ? null : "Must be a number";
+    case "json":
+      return value === undefined ? "Required" : null;
+  }
+}

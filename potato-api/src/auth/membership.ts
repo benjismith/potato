@@ -3,10 +3,12 @@ import type { Executor } from "../db/client.js";
 import {
   applications,
   environments,
+  flags,
   orgMembers,
   organizations,
   type Application,
   type Environment,
+  type Flag,
   type Organization,
 } from "../db/schema.js";
 import { notFound } from "../http/errors.js";
@@ -69,3 +71,19 @@ export async function loadEnvironment(
   return env;
 }
 
+
+/** Loads a flag (archived or not) in an org the user belongs to, or throws `404`. */
+export async function loadFlag(db: Executor, userId: string, flagId: string): Promise<Flag> {
+  const [flag] = await db
+    .select(getTableColumns(flags))
+    .from(flags)
+    .innerJoin(applications, eq(applications.id, flags.applicationId))
+    .innerJoin(
+      orgMembers,
+      and(eq(orgMembers.orgId, applications.orgId), eq(orgMembers.userId, userId)),
+    )
+    .where(eq(flags.id, flagId))
+    .limit(1);
+  if (!flag) throw notFound("Flag");
+  return flag;
+}

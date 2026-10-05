@@ -2,7 +2,7 @@
 id: "000006"
 title: Add flag management endpoints
 type: task
-status: open
+status: done
 priority: P1
 created: 2026-10-05
 updated: 2026-10-05
@@ -27,9 +27,20 @@ Every write records `updated_by` / `created_by` from the current user.
 
 ## Acceptance criteria
 
-- [ ] Flag keys are validated and unique per app (`409` on duplicate). Variation values must match the flag type (`400` otherwise).
-- [ ] Variation IDs in config and target updates must belong to the same flag (`400` otherwise).
-- [ ] Optimistic concurrency works: a stale `version` gets `409`, and success returns the new `version` (tested).
-- [ ] Targets can be added for subject keys that have never been seen.
-- [ ] All routes enforce the membership guard (`404` cross-tenant, tested).
-- [ ] `npm run typecheck` and `npm test` pass.
+- [x] Flag keys are validated and unique per app (`409` on duplicate). Variation values must match the flag type (`400` otherwise).
+- [x] Variation IDs in config and target updates must belong to the same flag (`400` otherwise).
+- [x] Optimistic concurrency works: a stale `version` gets `409`, and success returns the new `version` (tested).
+- [x] Targets can be added for subject keys that have never been seen.
+- [x] All routes enforce the membership guard (`404` cross-tenant, tested).
+- [x] `npm run typecheck` and `npm test` pass.
+
+## Notes
+
+- Implements API.md as written; no contract changes.
+- Choices API.md leaves open: deleting a target that doesn't exist is `404`
+  (and doesn't bump the version); `variations` must be omitted for boolean
+  flags (`400` otherwise); a JSON variation value of `null` is stored as JSON
+  `null`; config writes are allowed on archived flags; targets are sorted by
+  subject key.
+- Version checks are a single conditional `UPDATE … WHERE version = ?`, so
+  concurrent writers can't both succeed.

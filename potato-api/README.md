@@ -31,7 +31,7 @@ Then check `http://localhost:3000/health`.
 | `PORT`         | `3000`  | Port the HTTP server listens on. |
 | `DATABASE_URL` | none    | MySQL connection string, e.g. `mysql://root@localhost:3306/potato`. Required. |
 | `POTATO_CURRENT_USER_ID` | seeded user | The user every management request is authenticated as (v1 has no login). Defaults to `usr_0000000000000000000000SEED`, created by `npm run db:seed`. |
-| `TEST_DATABASE_URL` | none | MySQL database for integration tests, e.g. `mysql://root@localhost:3306/potato_test`. Required by `npm test`. Its name must end in `_test`. |
+| `TEST_DATABASE_URL` | none | MySQL database for integration tests, e.g. `mysql://root@localhost:3306/potato_test`. Required by `npm test`. Its name must contain a `test` segment (e.g. `potato_test`, `potato_test_sig`). |
 
 Variables are read from `.env` (git-ignored) if present. Real environment
 variables take precedence over `.env`.
@@ -142,5 +142,10 @@ database answered a trivial query:
 
 Implements the contract in
 [API.md](../potato-planning/docs/API.md): `GET /v1/me`, apps
-(`/v1/orgs/:orgId/apps`, `/v1/apps/:appId`), and environments
-(`/v1/apps/:appId/environments`).
+(`/v1/orgs/:orgId/apps`, `/v1/apps/:appId`), environments
+(`/v1/apps/:appId/environments`), and flags (`/v1/apps/:appId/flags`,
+`/v1/flags/:flagId…`), including per-environment configs and targets.
+
+Config and target writes use optimistic concurrency: send the config's
+current `version`, and a stale one gets `409 version_conflict` with
+`details: { currentVersion }`.

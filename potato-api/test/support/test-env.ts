@@ -7,10 +7,10 @@ export function requireTestDatabaseUrl(): string {
     );
   }
   const database = new URL(url).pathname.slice(1);
-  if (!database.endsWith("_test")) {
+  if (!/(^|_)test(_|$)/.test(database)) {
     // Every test truncates all tables, so never point this at real data.
     throw new Error(
-      `TEST_DATABASE_URL must name a database ending in "_test", got "${database}"`,
+      `TEST_DATABASE_URL must name a test database (e.g. potato_test or potato_test_sig), got "${database}"`,
     );
   }
   return url;
