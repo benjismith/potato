@@ -27,6 +27,38 @@ npm test
 
 ```
 src/
-└── index.ts          # Public entry point (the package's only export)
-test/                 # Vitest tests
+├── index.ts          # Public entry point (the package's only export)
+└── signing.ts        # Ed25519 request signing (SIGNING.md)
+test/                 # Vitest tests (signing tests load the shared vectors)
 ```
+
+## Request signing
+
+Every SDK API request is signed per
+[SIGNING.md](../potato-planning/docs/SIGNING.md). `signRequest` returns the
+four `X-Potato-*` headers:
+
+```ts
+import { signRequest } from "potato-sdk";
+
+const body = JSON.stringify({ subject: { key: "alice" } }); // serialize once
+const headers = signRequest({
+  keyId: "key_01J...",
+  privateKey: process.env.POTATO_PRIVATE_KEY!, // PKCS#8 PEM, or a KeyObject
+  method: "POST",
+  target: "/sdk/v1/evaluate", // path + "?query", exactly as sent
+  body,
+});
+await fetch(`https://potato.example.com/sdk/v1/evaluate`, {
+  method: "POST",
+  headers: { ...headers, "Content-Type": "application/json" },
+  body, // the same bytes that were signed
+});
+```
+
+- Send exactly the signed `body` to exactly the signed `target`, using the
+  uppercase method.
+- Each call uses the current time and a fresh nonce; sign again for retries.
+- `loadPrivateKey` validates a key up front. Non-Ed25519 keys and public keys
+  are rejected with a descriptive `TypeError`.
+- Lower-level helpers: `buildCanonicalString`, `hashBody`, `generateNonce`.

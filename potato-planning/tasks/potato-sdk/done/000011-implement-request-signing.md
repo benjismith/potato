@@ -2,7 +2,7 @@
 id: "000011"
 title: Implement request signing
 type: task
-status: open
+status: done
 priority: P0
 created: 2026-10-05
 updated: 2026-10-05
@@ -22,8 +22,8 @@ Implement the signer side of [SIGNING.md](../../../docs/SIGNING.md) in `potato-s
 
 ## Acceptance criteria
 
-- [ ] Tests load `potato-planning/docs/signing-vectors.json`. For every case, the body SHA-256, the canonical string, and the signature match exactly.
-- [ ] Without injection, each call produces a unique nonce in the spec's format and the current Unix-seconds timestamp.
-- [ ] The signature header is unpadded base64url, 86 characters long.
-- [ ] RSA/EC private keys and public keys are rejected with a descriptive error (tested).
-- [ ] `npm run typecheck`, `npm test`, and `npm run build` pass.
+- [x] Tests load `potato-planning/docs/signing-vectors.json`. For every case, the body SHA-256, the canonical string, and the signature match exactly.
+- [x] Without injection, each call produces a unique nonce in the spec's format and the current Unix-seconds timestamp.
+- [x] The signature header is unpadded base64url, 86 characters long.
+- [x] RSA/EC private keys and public keys are rejected with a descriptive error (tested).
+- [x] `npm run typecheck`, `npm test`, and `npm run build` pass.
